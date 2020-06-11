@@ -11,13 +11,11 @@ class Text(Control):
     def __init__(self, Type):
         Control.__init__(self, Type)
 
-    @property
-    def Text(self):
-        return self.send('innerText;', True).replace('<br>', '  ')
-
-    @Text.setter
-    def Text(self, html):
-        self.send('innerHTML="' + self.text_encoder(html) + '";')
+    def Text(self, html=None):
+        if html!=None:
+            self.send('innerHTML="' + self.text_encoder(html) + '";')
+        else:
+            return self.send('innerHTML;', True).replace('<br>', '  ')
 
     def text_encoder(self, text):
         s = text.split('"')
@@ -103,16 +101,13 @@ class Anchor(Text):
     def __init__(self):
         Text.__init__(self, 'a')
 
-    @property
-    def href(self):
-        return self.send('href;', True)
-
-    @href.setter
-    def href(self, link):
+    def href(self, link=None):
         """The link's destination is specified in the href"""
-
-        self.send('href="' + link + '";')
-
+        if link!=None:
+            self.send('href="' + link + '";')
+        else:
+            return self.send('href;', True)
+        
 
 class a(Anchor):
 
@@ -130,46 +125,40 @@ class Image(Control):
         self.src = None
         Control.__init__(self, 'img')
 
-    @property
-    def alt(self, text):
-        self.send('alt;', True)
 
-    @alt.setter
-    def alt(self, text):
-        self.send('alt="' + text + '";')
 
-    @property
-    def AlternativeText(self):
-        return self.alt
+    def alt(self, text=None):
+        if text!=None:
+            self.send('alt="' + text + '";')
+        else:
+            return self.send('alt;', True)
 
-    @AlternativeText.setter
-    def AlternativeText(self, text):
-        self.alt = text
+        
 
-    @property
-    def src(self, src):
-        self.send('src;', True)
+    def AlternativeText(self, text=None):
+        return self.alt(text)
 
-    @src.setter
+
+
     def src(
         self,
-        src,
+        src=None,
         name='',
         app=None,
         ):
-        if name == '':
-            self.send('src="' + src + '";')
+        if src!=None:
+            if name == '':
+                self.send('src="' + src + '";')
+            else:
+                self.src = src
+                app.Register('/images/' + name, self.handler)
         else:
-            self.src = src
-            app.Register('/images/' + name, self.handler)
+            return self.send('src;', True)
 
-    @property
-    def Source(self):
-        return self.src
 
-    @Source.setter
-    def Source(self, src):
-        self.src = src
+    def Source(self, src=None):
+        return self.src(src)
+            
 
     def handler(self, s):
         s.send_response(200)
@@ -203,8 +192,8 @@ class List(Control):
             Control.__init__(self, 'ul')
 
 
-def AddItem(self, node):
-    self.appendChild(node)
+    def AddItem(self, node):
+        self.appendChild(node)
 
 
 class UnorderedList(List):
@@ -253,13 +242,11 @@ class pre(Control):
     def __init__(self):
         Control.__init__(self, 'pre')
 
-    @property
-    def Text(self):
-        return self.send('innerHTML;', True)
-
-    @Text.setter
-    def Text(self, html):
-        self.send('innerHTML="' + html + '";')
+    def Text(self, html=None):
+        if html!=None:
+            self.send('innerHTML="' + html + '";')
+        else:
+            return self.send('innerHTML;', True)
 
 
 class b(Text):

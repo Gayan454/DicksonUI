@@ -53,6 +53,8 @@ class Control:
                 self.parent.run('document.getElementById("' + self._id
                                 + '").' + message)
         else:
+            if evaluate:
+                raise Exception("Cannot evaluate before run Application.\n In future we will support it")
             self._script += 'Control.'
             self._script += message
 

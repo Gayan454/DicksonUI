@@ -10,13 +10,14 @@
 import socket
 
 
-def find_free_port(port, max_port):
+def find_free_port(_port, max_port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    while port <= max_port:
+    while _port <= max_port:
         try:
-            sock.bind(('', port))
+            sock.bind(('', _port))
+            s, port = sock.getsockname()
             sock.close()
             return port
-        except OSError:
-            port += 1
+        except:
+            _port += 1
     raise IOError('no free ports')

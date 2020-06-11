@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 try:
     from http.server import HTTPServer, BaseHTTPRequestHandler
     from socketserver import ThreadingMixIn
@@ -10,8 +9,12 @@ except ImportError:
 import os
 import threading
 from .utiles import find_free_port
-from .Form import Form as form
 package_dir = os.path.dirname(__file__)
+from sys import version_info
+if version_info[0] < 3:
+    from .Form_min import Form as form
+else:
+    from .Form import Form as form
 
 class Application(ThreadingMixIn, HTTPServer):
 
@@ -32,14 +35,12 @@ class Application(ThreadingMixIn, HTTPServer):
         self._counter = 0
         self.routes = {}
         self.Icon = None
-        HTTPServer.__init__(self, (host, port), RequestHandler)
+        self.location ='http://localhost:' + str(self.port)
+        HTTPServer.__init__(self, (host, self.port), RequestHandler)
         t = threading.Thread(target=self.serve_forever)
         t.daemon = False
         t.start()
 
-    @property
-    def location(self):
-        return 'http://localhost:' + str(self.port)
 
     def rhandler(self, s):
         if s.path == '/DicksonUI.js':
@@ -47,28 +48,36 @@ class Application(ThreadingMixIn, HTTPServer):
             s.send_response(200)
             s.send_no_cache_headers()
             s.end_headers()
-            s.wfile.write(bytes(open(path).read(), 'utf-8'))
+            s.write_bytes(open(path).read())
         if s.path == '/favicon.ico':
             try:
                 s.send_response(200)
                 s.send_no_cache_headers()
                 s.end_headers()
                 s.wfile.write(self.Icon)
-            except:
-                raise Exception('Icon Not Found.')
+            except Exception as e:
+                print(e)
         if s.path == '/':
             s.send_response(302)
+            if version_info[0] < 3:
+                fn = self._forms[0].Name()
+            else:
+                fn = self._forms[0].Name
             s.send_header('Location', 'http://localhost:'
-                          + str(self.port) + '/' + self._forms[0].Name)
+                          + str(self.port) + '/' + fn)
             s.end_headers()
         for _form in self._forms:
-            if s.path.startswith('/' + _form.Name):
-                if s.path == '/' + _form.Name:
+            if version_info[0] < 3:
+                fn = _form.Name()
+            else:
+                fn = _form.Name
+            if s.path.startswith('/' + fn):
+                if s.path == '/' + fn:
                     path = os.path.join(package_dir, 'index.html')
                     s.send_response(200)
                     s.send_no_cache_headers()
                     s.end_headers()
-                    s.wfile.write(bytes(open(path).read(), 'utf-8'))
+                    s.write_bytes(open(path).read())
                 else:
                     _form.RequestHandler(s)
         for route in self.routes:
@@ -80,9 +89,14 @@ class Application(ThreadingMixIn, HTTPServer):
         self.routes[Path] = Handler
 
     def Add(self, Form=form):
-        if Form.Name == None:
-            self._counter += 1
-            Form.Name = 'Form' + str(self._counter)
+        if version_info[0] < 3:
+            if Form.Name() == None:
+                self._counter += 1
+                Form.Name('Form' + str(self._counter))
+        else:
+            if Form.Name == None:
+                self._counter += 1
+                Form.Name = 'Form' + str(self._counter)
         self._forms.append(Form)
 
     def config(self, *args):
@@ -90,7 +104,7 @@ class Application(ThreadingMixIn, HTTPServer):
 
     def Show(self, form):
         if self.conf[0] == 'chrome app':
-            from chrome import chrome
+            from .chrome import chrome
             c = chrome()
             path = c.find_path()
             if path == None:
@@ -101,26 +115,25 @@ class Application(ThreadingMixIn, HTTPServer):
             t.daemon = True
             t.start()
         elif self.conf[0] == 'firefox':
-            from firefox import firefox
+            from .firefox import firefox
             f = firefox()
             path = f.find_path()
             if path == None:
                 raise Exception('Firefox not available')
             t = threading.Thread(target=f.run, args=[
-                path,
-                self.conf[1],
-                self.location + '/' + form.Name,
-                self.conf[2],
-                self.conf[3],
-                self.conf[4],
-                ])
+                                path,
+                                self.conf[1],
+                                self.location + '/' + form.Name,
+                                self.conf[2],
+                                self.conf[3],
+                                self.conf[4],])
             t.daemon = True
             t.start()
         elif self.conf[0] == 'edge':
-            from edge import edge
+            from .edge import edge
             t = threading.Thread(target=edge.run, args=[path,
-                                 self.conf[1], self.location + '/'
-                                 + form.Name])
+                self.conf[1], self.location + '/'
+                + form.Name])
             t.daemon = True
             t.start()
         elif self.conf[0] == 'webview':
@@ -145,15 +158,6 @@ class Application(ThreadingMixIn, HTTPServer):
 
 class RequestHandler(BaseHTTPRequestHandler):
 
-    def __init__(
-        self,
-        request,
-        client_address,
-        server,
-        ):
-
-        super().__init__(request, client_address, server)
-
     def do_GET(self):
         self.server.rhandler(self)
 
@@ -169,9 +173,13 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.server.rhandler(self)
+    
+    def write_bytes(self, string):
+        try:
+            self.wfile.write(bytes(string))
+        except:
+            self.wfile.write(bytes(string, 'utf-8'))
 
-    def send_response(self, code, message=None):
-        self.log_request(code)
-        self.send_response_only(code, message)
-        self.send_header('Server', 'DicksonUI')
-        self.send_header('Date', self.date_time_string())
+    def version_string(self):
+        """Return the server software version string."""
+        return "DicksonUI"

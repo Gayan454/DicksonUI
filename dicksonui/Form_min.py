@@ -26,14 +26,14 @@ class Form:
         self.eval_id = 0
         self.eval_list = {}
 
-    @property
-    def Name(self):
-        return self._name
 
-    @Name.setter
-    def Name(self, name):
-        self.run('document.title="'+str(name)+'";')
-        self._name = name
+    def Name(self, name=None):
+        if name!=None:
+            self.run('document.title="'+str(name)+'";')
+            self._name = name
+        else:
+            return self._name
+            
 
     def Add(self, control):
         a = control.initialize(str(self.control_counter), self)
