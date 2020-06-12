@@ -67,12 +67,26 @@ And then navigate to above link.
 
 #### Add items to form 
 Okay, now that we will learn about Controls
+for python3
 
 ```Python
 from dicksonui import Form, Application, Controls
 MyHeading = Controls.Heading(1)
 MyHeading.innerHTML = """Hello world!
 bye!"""
+Myform = Form()
+Myform.Add(MyHeading)
+App = Application()
+App.Add(Myform)
+print(App.location)
+```
+for python2
+
+```Python
+from dicksonui import Form, Application, Controls
+MyHeading = Controls.Heading(1)
+MyHeading.innerHTML("""Hello world!
+bye!""")
 Myform = Form()
 Myform.Add(MyHeading)
 App = Application()
