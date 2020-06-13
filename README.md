@@ -34,8 +34,10 @@ in python3
 $ pip install dicksonui
 ```
 If you use easy_install,  `easy_install browsergui`.
-If you don't like package managers, just download from Github and unzip   and put the  `browsergui`  folder anywhere on your Python path.
-
+If you don't like package managers, just download from Github and unzip   and run
+```sh
+python setup.py install
+```
 ## Initialize a Window
 First, let's create a new Application. 
 
