@@ -29,7 +29,7 @@ DicksonUI is available on python 2 and 3 both. Dosen"t require Additional depend
 ```sh
 $ pip install dicksonui
 ```
-If you use easy_install,  `easy_install browsergui`.
+If you use easy_install,  `easy_install dicksonui`.
 If you don't like package managers, just download from Github and unzip   and run
 ```sh
 $ python setup.py install
