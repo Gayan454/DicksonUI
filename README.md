@@ -1,5 +1,7 @@
 # DicksonUI - The Best GUI Library For Python
+
 ![Build Python Package](https://github.com/Ksengine/DicksonUI/workflows/Build%20Python%20Package/badge.svg)
+
 With DicksonUI, you can make Graphical User Interfaces with python with just few lines of code. DicksonUI is super easy to use and handles everything for you. Just write your code easily
 or import any HTML code.
 
