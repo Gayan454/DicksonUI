@@ -1,5 +1,5 @@
 # DicksonUI - The Best GUI Library For Python
-
+![Build Python Package](https://github.com/Ksengine/DicksonUI/workflows/Build%20Python%20Package/badge.svg)
 With DicksonUI, you can make Graphical User Interfaces with python with just few lines of code. DicksonUI is super easy to use and handles everything for you. Just write your code easily
 or import any HTML code.
 
@@ -28,7 +28,10 @@ DicksonUI is available on python 2 and 3 both. Dosen"t require Additional depend
 $ pip install dicksonui
 ```
 If you use easy_install,  `easy_install browsergui`.
-If you don't like package managers, just download from Github and unzip   and put the  `browsergui`  folder anywhere on your Python path.
+If you don't like package managers, just download from Github and unzip   and run
+```sh
+$ python setup.py install
+```
 
 ## Initialize a Window
 First, let's create a new Application. 
@@ -63,12 +66,24 @@ And then navigate to above link.
 
 #### Add items to form 
 Okay, now that we will learn about Controls
-
+for python3
 ```Python
 from dicksonui import Form, Application, Controls
 MyHeading = Controls.heading(1)
 Heading.innerHTML = """Hello world!
 bye!"""
+Myform = Form()
+Myform.Add(MyHeading)
+App = Aplication()
+App.Add(Myform)
+print(App.location)
+```
+for python2
+```Python
+from dicksonui import Form, Application, Controls
+MyHeading = Controls.heading(1)
+Heading.innerHTML("""Hello world!
+bye!""")
 Myform = Form()
 Myform.Add(MyHeading)
 App = Aplication()
