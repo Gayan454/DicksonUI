@@ -20,15 +20,16 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel egg
+        pip install setuptools wheel egg twine
     - name: Build
       run: |
         python setup.py sdist
         python setup.py bdist
         python setup.py bdist_wheel
         python setup.py bdist_egg
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: pypi-AgEIcHlwaS5vcmcCJGVlZTVhMjg1LTYyMGYtNGRkMC05Y2ZlLTc5NjZhZmM0NzEwYgACOnsicGVybWlzc2lvbnMiOiB7InByb2plY3RzIjogWyJkaWNrc29udWkiXX0sICJ2ZXJzaW9uIjogMX0AAAYghG-34OmAHVVxYCDNP943fkyiGPD-cwjuFSwGdEjI9b4
-        password: ${{ secrets.KsengineDicksonUIpassword }}
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        twine upload dist/*
