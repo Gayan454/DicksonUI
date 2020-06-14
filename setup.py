@@ -8,19 +8,10 @@ import os
 package_dir = os.path.dirname(__file__)
 
 README = open(package_dir + "README.md","r").read()
-art ="""
 
-██████╗░██╗░█████╗░██╗░░██╗░██████╗░█████╗░███╗░░██╗██╗░░░██╗██╗
-██╔══██╗██║██╔══██╗██║░██╔╝██╔════╝██╔══██╗████╗░██║██║░░░██║██║
-██║░░██║██║██║░░╚═╝█████═╝░╚█████╗░██║░░██║██╔██╗██║██║░░░██║██║
-██║░░██║██║██║░░██╗██╔═██╗░░╚═══██╗██║░░██║██║╚████║██║░░░██║██║
-██████╔╝██║╚█████╔╝██║░╚██╗██████╔╝╚█████╔╝██║░╚███║╚██████╔╝██║
-╚═════╝░╚═╝░╚════╝░╚═╝░░╚═╝╚═════╝░░╚════╝░╚═╝░░╚══╝░╚═════╝░╚═╝
-"""
-print(art)
 setup(
     name="DicksonUI",
-    version="1.1.3",
+    version="1.1.4",
     description="Lightweight And Full Featured Browser Based UI / GUI (Graphical User Interface Library)",
     long_description=README,
     long_description_content_type="text/markdown",
