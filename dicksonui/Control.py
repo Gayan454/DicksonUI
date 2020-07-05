@@ -4,121 +4,78 @@
 #
 #  Control.py
 #
-
+from .fakeattr import fakeattr
 
 class Control:
-
     def __init__(self, TagName):
         self._hosted = False  # Is added to Form
-        self._script = ''  # Javascript code (Used before added to Form)
-        self._id = ''  # Used By Form to identify control   Dont change
-        self._script += 'var Control = document.createElement("' \
+        self.script = ''  # Javascript code (Used before added to Form)
+        self.id = None
+        self.script += 'var Control = document.createElement("' \
             + TagName + '");'
-        self.events = {}
         self.Controls = []
-        pass
+        self.handlers={}
 
-    # Below function is only used by Form !
-
-    def initialize(self, Id, parent):
-        self._id = Id
-        self.parent = parent
+    def initialize(self, parent):
+        self.parent=parent
+        if not self.id:
+            parent.controls_id_index+=1
+            self.id = str(parent.controls_id_index)
+        self._run = parent._run
+        self.register = parent.register
         self._hosted = True
-        return self._script + 'Control.id = "' + self._id + '";'
+        for handler in self.handlers:
+            for function in self.handlers[handler]:
+                self.register(self.id+'.'+handler, function)
+        return self.script + 'Control.id = "' + self.id + '";'
 
     def child_handler(self):
         for Control in self.Controls:
-            self.parent.Add(Control)
-            self.send('appendChild(document.getElementById("'
-                      + Control.Id + '"));')
+            self.appendChild(Control)
 
-    @property
-    def Id(self, Id=None):
-        if self.Id == None:
-            self.Id = Id
-        return self.Id
-
-    @Id.getter
-    def Id(self):
-        return self._id
-
-    def send(self, message, evaluate=False):
+    def run(self, message, evaluate=False):
         """This will change script(Javascript) """
-
-        if self._hosted == True:  # check if control is added to Form
+        if self._hosted:  # check if control is added to Form
             if evaluate:
-                return self.parent.evaluate('document.getElementById("'
-                        + self._id + '").' + message)
+                return self._run('document.getElementById("'
+                        + self.id + '").' + message,True)
             else:
-                self.parent.run('document.getElementById("' + self._id
+                self._run('document.getElementById("' + self.id
                                 + '").' + message)
         else:
             if evaluate:
-                raise Exception("Cannot evaluate before run Application.\n In future we will support it")
-            self._script += 'Control.'
-            self._script += message
+                raise Exception("Cannot evaluate before run Application.")
+            self.script += 'Control.'
+            self.script += message
 
-    def run(self, script):
-        self.send(script)
-
-    def evaluate(self, script):
-        self.send(script, True)
-
-    def innerHTML(self, html):
-        """The innerHTML property sets or returns the HTML content (inner HTML) of an element."""
-
-        self.send('innerHTML;', True)
-
-    def innerHTML(self, html):
-        self.send('innerHTML="' + html + '";')
-
-    def setAttribute(self, attributename, attributevalue):
-        """The setAttribute() method adds the specified attribute to an element,
-        and gives it the specified value."""
-
-        self.send('setAttribute("' + attributename + '", "'
-                  + attributevalue + '");')
-
-    def addEventListener(
-        self,
-        event,
-        function,
-        useCapture=False,
-        ):
-        """The addEventListener() method attaches an event handler to the specified element."""
-
-        self.events[str(event)] = function
-        self.send('addEventListener("' + event + '", notify_server, '
-                  + str(useCapture).lower() + ');')
-
-    def fire_event(self, EventData):
-        for event in self.events:
-            if event == EventData['type']:
-                f = self.events[event]
-                f(self, EventData)
-
-    def Width(self, w):
-        self.send('width="' + str(w) + '";')
-
-    def Height(self, h):
-        self.send('height="' + str(h) + '";')
-
-    def Size(self, w, h):
-        self.Width(w)
-        self.Height(h)
-
-    def appendChild(self, node):
+    def appendChild(self, child):
         if self._hosted:
-            self.parent.Add(node)
-            self.send('appendChild(document.getElementById("' + node.Id
-                      + '"));')
+            self._run(child.initialize(self.parent)+'document.getElementById("'
+                        + self.id + '").appendChild(Control);')
+            child.child_handler()
         else:
-            self.Controls.append(node)
+            self.Controls.append(child)
+    
+    def __getattr__(self, name):
+        d=self.__dict__.get(name)
+        if d:
+            return d
+        return fakeattr(self.run,name)
 
-    def style(self, prop, style):
-        self.send('style.' + prop + '="' + style + '";')
+    def __setattr__(self, name, attr):
+        if name in ['script','_hosted','id','Controls','parent','_run','handlers','register']:
+            self.__dict__[name]=attr
+        else:
+            if isinstance(attr,str):
+                attr='"'+attr.replace('"','\\'+'"').replace('\'','\\'+'\'').replace('\n','\\'+'n')+'"'
+            self.run(name+'='+str(attr)+';')
 
-    def classList(self):
-
-        def add(self, classname):
-            self.send('classList.add("' + classname + '");')
+    def addEventListener(self, _type, listner):
+        if not self._hosted:
+            if self.handlers.get(_type):
+                self.handlers[_type].append(listner)
+            else:
+                self.handlers[_type]=[listner]
+        else:
+            self.register(self.id+'.'+_type, listner)
+        self.run('addEventListener("'+_type+'",dicksonui_event_handler);')

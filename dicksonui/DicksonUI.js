@@ -1,43 +1,25 @@
-function obey_forever() {
-    var request = new XMLHttpRequest();
-    request.open('get',window.location.href+ '/command');
-    request.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var child = document.createElement("script");
-            child.setAttribute("id", "script");
-            child.setAttribute("type", "text/javascript");
-            child.innerHTML = this.responseText;
-            document.body.replaceChild(child, document.getElementById("script"));
-        }
+var env_index=0;
+var sock = SignalPy(window.location.host+window.location.pathname+'/Hub');
+function setsock(){sock = SignalPy(window.location.host+window.location.pathname+'/Hub');}
+sock.onerror=function(data) {try{setTimeout(setsock,2)}catch{}}
+sock.onclose=function(data) {try{setTimeout(setsock,2)}catch{}}
+sock.onmessage=function(data) {
+    s=document.createElement('script');
+    s.id='dicksonuienvironment'+env_index.toString();
+    s.innerHTML=data.data+'document.head.removeChild(document.getElementById("'+s.id+'"));';
+    document.head.appendChild(s);
     };
-    request.onerror = function() {
-        obey_forever();
-    };
-    request.send();
-}
-
-obey_forever();
-
-function notify_server(event) {
-    console.log('notifying server:', event);
-    var request = new XMLHttpRequest();
+function dicksonui_event_handler(event){
     var data = {};
     for (x in event) {
         data[x] = event[x]
     }
     data.target = event.target.id;
     data.currentTarget = event.currentTarget.id;
-    request.open('post', window.location.href+'/event');
-    request.send(JSON.stringify(JSON.decycle(data), null, 4));
-}
-
-function notify_data(data) {
-    console.log('notifying data:', data);
-    var request = new XMLHttpRequest();
-    request.open('post', window.location.href+'/data');
-    request.send(JSON.stringify(JSON.decycle(data), null, 4));
-}
-
+    sd={};
+    sd.data=data;
+    sd.ftarget=data.target+'.'+event.type;
+    sock.send(JSON.stringify(JSON.decycle(sd)));}
 if (typeof JSON.decycle !== 'function') {
     (function() {
 
