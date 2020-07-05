@@ -1,6 +1,7 @@
 # DicksonUI - The Best GUI Library For Python
 
 ![Build Python Package](https://github.com/Ksengine/DicksonUI/workflows/Build%20Python%20Package/badge.svg)
+[![Downloads](https://pepy.tech/badge/dicksonui)](https://pepy.tech/project/dicksonui)
 
 With DicksonUI, you can make Graphical User Interfaces with python with just few lines of code. DicksonUI is super easy to use and handles everything for you. Just write your code easily
 or import any HTML code.
@@ -88,7 +89,8 @@ View wiki for more info
 
 ## alternatives?
 
--[RemI](https://github.com/dddomodossola/remi), which has exactly the same idea (build a GUI in Python, run it in a browser). Definitely worth a look.It is little heavy and use websockets. So it cannot run on older browsers. we used both websockets and long polling
+-[RemI](https://github.com/dddomodossola/remi), which has exactly the same idea (build a GUI in Python, run it in a browser). Definitely worth a look.It is little heavy and use websockets. So it cannot run on older browsers. we used both websockets and long polling.
+
 -[tkinter](https://docs.python.org/3/library/tkinter.html#module-tkinter)  (standard library)
 
 Advantages: it's well-known. Lots of people have written tutorials and documentation for it.
